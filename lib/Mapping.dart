@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'AuthenticationPage.dart';
 import 'HomePage.dart';
 import 'Authentication.dart';
+import 'Database.dart';
 
 class Mapping extends StatefulWidget {
   final AuthImplementation auth;

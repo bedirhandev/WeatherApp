@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // My custom classes
 import 'Authentication.dart';
 import 'HomePage.dart';
+import 'Database.dart';
 
 class AuthenticationPage extends StatefulWidget {
   final AuthImplementation auth;
@@ -49,6 +51,15 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   // Initialize the form
   _Form form = _Form();
 
+  bool loading = false;
+
+  @override
+   void setState(fn) {
+    if(mounted){
+      super.setState(fn);
+    }
+  }
+
   // methods
   bool save() { // Saves the values of the form after a button pressed
     if(form.key.currentState.validate()) {
@@ -62,6 +73,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   void submit() async {
     if(save()) { // Call the save method
       try {
+        await setState(() => loading = true);
+
         // If we are on the login page singin, else signup
         String userId = (_authenticationAction == AuthenticationPageAction.Login) 
         ? await widget.auth.signIn(form.email, form.password)
@@ -72,16 +85,24 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           // Update status to user signed (in)
           widget.setAuthentication();
 
+          // Add user to the database
+          CollectionReference credentials = await Database.collections.credentials();
+          credentials.add({
+              'email': form.email,
+              'password': form.password,
+              'uid': userId
+          });
+
           // Navigate to the homepage and forget all the previous routes
           // This disables the navigation between the homepage and this page
           Navigator
           .of(context)
-          .pushReplacement(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+          .pushReplacement(MaterialPageRoute(builder: (BuildContext context) => HomePage(auth: widget.auth, setAuthentication: widget.setAuthentication)));
         }
-
       } catch(e) {
         // Catch the error if authenticating to Firebase fails
         print("Error: ${e.toString()}");
+        await setState(() => loading = false);
       }
     }
   }
@@ -113,7 +134,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       appBar: AppBar(
         title: Text('Weersverwachtingen'),
       ),
-      body: Container(
+      body: (loading) ? Center(child: CircularProgressIndicator()) : Container(
         margin: EdgeInsets.all(15.0),
         child: Form(
           key: form.key,

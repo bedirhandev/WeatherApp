@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/CityPage.dart';
 
 // My custom class
 import 'Authentication.dart';
@@ -16,6 +17,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +47,12 @@ class _HomePageState extends State<HomePage> {
                 iconSize: 100,
                 color: Colors.white,
                 tooltip: 'Voeg een nieuwe locatie toe',
-                onPressed: () {}
+                onPressed: () {
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(builder: (context) => CityPage(auth: widget.auth, setAuthentication: widget.setAuthentication)),
+                  );
+                }
               ),
             ],
           )
