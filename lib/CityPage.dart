@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -48,7 +49,13 @@ class _CityPageState extends State<CityPage> {
       body: StreamProvider<List<DutchCity>>.value(
         // All children will have access to SuperHero data
         stream: Stream.fromFuture(httpService.streamDutchCities()),
-        child: ListViewCities(),
+        child: Consumer<List<DutchCity>>(builder: (context, cities, child) {
+          if(cities != null) {
+            return ListViewCities();
+          } else {
+            return Center(child: CircularProgressIndicator())
+          }
+        }),
       ),
     );
   }
