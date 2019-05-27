@@ -1,8 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
-import 'dart:convert';
 
 class DutchCity {
   final String city,
@@ -14,7 +10,9 @@ class DutchCity {
       lat,
       lng,
       population;
-  bool checked = false;
+
+  bool checked;
+  num tmp = 0.0;
 
   DutchCity(
       {this.city,
@@ -25,35 +23,36 @@ class DutchCity {
       this.capital,
       this.lat,
       this.lng,
-      this.population});
+      this.population,
+      this.checked});
 
   factory DutchCity.fromFirestore(DocumentSnapshot document) {
     Map data = document.data;
 
     return DutchCity(
-      city: data['city'] ?? 'default',
-      admin: data['admin'] ?? 'default',
-      country: data['country'] ?? 'default',
-      populationProper: data['population_proper'] ?? 'default',
-      iso2: data['iso2'] ?? 'default',
-      capital: data['capital'] ?? 'default',
-      lat: data['lat'] ?? 'default',
-      lng: data['lng'] ?? 'default',
-      population: data['population'] ?? 'default',
-    );
+        city: data['city'] ?? 'default',
+        admin: data['admin'] ?? 'default',
+        country: data['country'] ?? 'default',
+        populationProper: data['population_proper'] ?? 'default',
+        iso2: data['iso2'] ?? 'default',
+        capital: data['capital'] ?? 'default',
+        lat: data['lat'] ?? 'default',
+        lng: data['lng'] ?? 'default',
+        population: data['population'] ?? 'default',
+        checked: data['checked'] ?? false);
   }
 
   factory DutchCity.fromMap(Map data) {
     return DutchCity(
-      city: data['city'] ?? 'default',
-      admin: data['admin'] ?? 'default',
-      country: data['country'] ?? 'default',
-      populationProper: data['population_proper'] ?? 'default',
-      iso2: data['iso2'] ?? 'default',
-      capital: data['capital'] ?? 'default',
-      lat: data['lat'] ?? 'default',
-      lng: data['lng'] ?? 'default',
-      population: data['population'] ?? 'default',
-    );
+        city: data['city'] ?? 'default',
+        admin: data['admin'] ?? 'default',
+        country: data['country'] ?? 'default',
+        populationProper: data['population_proper'] ?? 'default',
+        iso2: data['iso2'] ?? 'default',
+        capital: data['capital'] ?? 'default',
+        lat: data['lat'] ?? 'default',
+        lng: data['lng'] ?? 'default',
+        population: data['population'] ?? 'default',
+        checked: data['checked'] ?? false);
   }
 }

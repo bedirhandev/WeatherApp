@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 // My custom classes
 import 'Mapping.dart';
 
+import 'Cities.dart';
+import 'ServiceProvider.dart';
+
 // Run the MaterialApp
 void main() => runApp(WeatherApp());
 
@@ -15,6 +18,10 @@ class WeatherApp extends StatelessWidget {
       providers: [
         StreamProvider<FirebaseUser>.value(
           stream: FirebaseAuth.instance.onAuthStateChanged,
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => DutchCities(),
+          child: ListViewCities(),
         )
       ],
       child: MaterialApp(

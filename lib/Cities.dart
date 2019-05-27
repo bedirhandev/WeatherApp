@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'Models.dart';
+import 'ServiceProvider.dart';
 
 class ListViewCities extends StatefulWidget {
+  final auth = FirebaseAuth.instance;
+
   ListViewCities();
 
   State<StatefulWidget> createState() {
@@ -14,43 +18,45 @@ class ListViewCities extends StatefulWidget {
 class _ListViewCitiesState extends State<ListViewCities> {
   @override
   Widget build(BuildContext context) {
-    List<DutchCity> dutchCities = Provider.of<List<DutchCity>>(context);
+    final user = Provider.of<FirebaseUser>(context);
+    final citiesProvider = Provider.of<DutchCities>(context);
 
-    
-      return Container(
-        child: ListView.builder(
-          itemCount: dutchCities.length,
-          padding: const EdgeInsets.all(15.0),
-          itemBuilder: (context, position) {
-            return Column(
-              children: <Widget>[
-                Divider(height: 5.0),
-                ListTile(
-                  title: Text(
-                    '${dutchCities[position].city}',
-                    style: TextStyle(
-                        fontSize: 22.0, color: Colors.deepOrangeAccent),
-                  ),
-                  leading: Text((position + 1).toString() + '.'),
-                  trailing: Transform.scale(
-                      scale: 1.25,
-                      child: Checkbox(
-                          onChanged: (bool value) {
-                            setState(() {
-                              DutchCity city = dutchCities[position];
-                              city.checked = value;
-                              // create favo city in db
-                            });
-                          },
-                          value: dutchCities[position].checked)),
-                  onTap: () => _onTapItem(context, dutchCities[position]),
-                ),
-              ],
-            );
-          },
-        ),
-      );
+    citiesProvider.fetchCities(user);
+
+    if (citiesProvider.cities.length == 0) {
+      return Center(child: CircularProgressIndicator());
     }
+
+    return Container(
+        child: ListView.builder(
+      itemCount: citiesProvider.cities.length,
+      padding: const EdgeInsets.all(15.0),
+      itemBuilder: (context, position) {
+        return Column(
+          children: <Widget>[
+            Divider(height: 5.0),
+            ListTile(
+              title: Text(
+                '${citiesProvider.cities[position].city}',
+                style:
+                    TextStyle(fontSize: 22.0, color: Colors.deepOrangeAccent),
+              ),
+              leading: Text((position + 1).toString() + '.'),
+              trailing: Transform.scale(
+                  scale: 1.3,
+                  child: Checkbox(
+                      onChanged: (bool value) => citiesProvider.setFavoCity(
+                          position,
+                          citiesProvider.cities[position].city,
+                          value,
+                          user),
+                      value: citiesProvider.cities[position].checked)),
+              onTap: () => _onTapItem(context, citiesProvider.cities[position]),
+            ),
+          ],
+        );
+      },
+    ));
   }
 
   void _onTapItem(BuildContext context, DutchCity city) {
